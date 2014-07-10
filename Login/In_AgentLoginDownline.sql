@@ -61,37 +61,36 @@ BEGIN
 	BEGIN  
 	  --'Wrong username or password.'   		    
 	  SELECT @ErrCode= 17001   
-	 -- SET @Remark = 'User: ' + @UserName +  ' - ' + 'Failed(Password)'     
+	  SET @Remark = 'Agent: ' + @UserName +  ' - ' + 'Failed(Username_Password)'     
 	    
-	 -- SET @End  = GETDATE()  
-	 -- SET @Duration = DATEDIFF(MILLISECOND,@Begin,@End)  
+	  SET @End  = GETDATE()  
+	  SET @Duration = DATEDIFF(MILLISECOND,@Begin,@End)  
 	  
-	 -- EXEC InLogDB.dbo.WriteLog_LoginAgent  
-		--@AdminId  = @AgentID,  
-		--@SpName  ='In_AgentLoginDownline',  
-		--@LogDate  =@End,  
-		--@Duration  =@Duration,  
-		--@Data   =@LogData,  
-		--@OldData  =@Remark  
+	  EXEC InLogDB.dbo.In_WriteLog_LoginAgent  
+		@AgentID  = @AgentID,  
+		@SpName  ='In_AgentLoginDownline',  
+		@LogDate  =@End,  
+		@Duration  =@Duration,  
+		@Data   =@LogData,  
+		@OldData  =@Remark  
 	  RETURN  	    
 	END  
 	ELSE IF (@Status <> 1)  
 	BEGIN  
-	  --print @Status  
-	  --'This user is not active.'    
+	  --'This user is not open.'    
 	  SELECT @ErrCode= 17002     
-	 -- SET @Remark = 'User: ' + @UserName + ' - ' + 'Failed(User_Not_Active)'    
+	  SET @Remark = 'Agent: ' + @UserName + ' - ' + 'Failed(User_Not_Open)'    
 	    
-	 -- SET @End  = GETDATE()  
-	 -- SET @Duration = DATEDIFF(MILLISECOND,@Begin,@End)  
+	  SET @End  = GETDATE()  
+	  SET @Duration = DATEDIFF(MILLISECOND,@Begin,@End)  
 	  
-	 -- EXEC InLogDB.dbo.WriteLog_LoginAgent 
-		--@AdminId  = @UserId,  
-		--@SpName  ='In_AgentLoginDownline',  
-		--@LogDate  =@End,  
-		--@Duration  =@Duration,  
-		--@Data   =@LogData,  
-		--@OldData  =@Remark  
+	  EXEC InLogDB.dbo.In_WriteLog_LoginAgent  
+		@AgentID  = @AgentID,  
+		@SpName  ='In_AgentLoginDownline',  
+		@LogDate  =@End,  
+		@Duration  =@Duration,  
+		@Data   =@LogData,  
+		@OldData  =@Remark   
 	  RETURN  	    
 	END 
 	IF @ErrCode = 0 
@@ -102,19 +101,19 @@ BEGIN
 		WHERE alv.CustId = @AgentL0Id
 	END
 	
-	--SET @AgentID		= ISNULL(@AgentID,0)
-	--SET @Remark = 'Agent: ' + @AgentID + ' - ' + 'Success'   
+	SET @AgentID		= ISNULL(@AgentID,0)
+	SET @Remark = 'Agent: ' + @UserName + ' - ' + 'Success'  
 
-	--SET @End		= GETDATE()
-	--SET @Duration	= DATEDIFF(MILLISECOND,@Begin,@End)
+	SET @End		= GETDATE()
+	SET @Duration	= DATEDIFF(MILLISECOND,@Begin,@End)
 
-	--EXEC InLogDB.dbo.WriteLog_LoginAgent
-	--			 @AdminId		= @UserId,
-	--			 @SpName		='In_AgentLoginDownline',
-	--			 @LogDate		=@End,
-	--			 @Duration		=@Duration,
-	--			 @Data			=@LogData,
-	--			 @OldData		=@Remark
+	EXEC InLogDB.dbo.In_WriteLog_LoginAgent  
+		@AgentID  = @AgentID,  
+		@SpName  ='In_AgentLoginDownline',  
+		@LogDate  =@End,  
+		@Duration  =@Duration,  
+		@Data   =@LogData,  
+		@OldData  =@Remark 
 END
 GO
 
