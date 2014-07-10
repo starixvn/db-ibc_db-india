@@ -10,6 +10,7 @@
 	 @AgentLevel	SMALLINT		= 0		OUTPUT,    
 	 @Currency		VARCHAR(10)		= ''	OUTPUT,    
 	 @CurrencyId	INT				= 0		OUTPUT,
+	 @MaxLevel		INT				= 0		OUTPUT,
 	 @ErrCode		INT				= 0		OUTPUT 
 AS  
 /*  
@@ -20,7 +21,7 @@ AS
 */  
 BEGIN  
 	SET NOCOUNT ON  
-
+	DECLARE @AgentL0Id INT
 	DECLARE @Begin  DATETIME  
 	  ,@End  DATETIME  
 	  ,@Duration INT  
@@ -30,19 +31,19 @@ BEGIN
 	  ,@Remark  NVARCHAR(500)  
 	SET @Begin = GETDATE() 
 	
-	--SET @xml = (  
-	--   SELECT   
-	--	@AgentID  AS '@ag', 
-	--	@AgentLevel  AS '@agl', 
-	--	@LoginDomain AS '@ldo',
-	--	@LoginIP AS '@i',
-	--	@BrowserName AS '@br',
-	--	@Platform AS '@pl',
-	--	@CountryCode AS '@co',
-	--	@UserName AS '@usr'
-	--	FOR XML PATH('z'), ROOT('r')  
-	--  )  
-	--SET @LogData = REPLACE(CONVERT(VARCHAR(MAX), @xml), '" />', '"/"')  
+	SET @xml = (  
+	   SELECT   
+		@AgentID  AS '@ag', 
+		@AgentLevel  AS '@agl', 
+		@LoginDomain AS '@ldo',
+		@LoginIP AS '@i',
+		@BrowserName AS '@br',
+		@Platform AS '@pl',
+		@CountryCode AS '@co',
+		@UserName AS '@usr'
+		FOR XML PATH('z'), ROOT('r')  
+	  )  
+	SET @LogData = REPLACE(CONVERT(VARCHAR(MAX), @xml), '" />', '"/"')  
   
 	SELECT   
 	 @AgentID	= ai.AgentId,  
@@ -93,6 +94,13 @@ BEGIN
 		--@OldData  =@Remark  
 	  RETURN  	    
 	END 
+	IF @ErrCode = 0 
+	BEGIN
+		SELECT @AgentL0Id = dbo.f_GetAgentIdLevel0(@AgentID)
+		SELECT @MaxLevel = alv.NumberAgentLevel
+		FROM AgentLevelSetting alv
+		WHERE alv.CustId = @AgentL0Id
+	END
 	
 	--SET @AgentID		= ISNULL(@AgentID,0)
 	--SET @Remark = 'Agent: ' + @AgentID + ' - ' + 'Success'   
