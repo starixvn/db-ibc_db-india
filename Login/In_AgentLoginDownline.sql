@@ -29,21 +29,7 @@ BEGIN
 	  ,@xml   XML  
 	  ,@LogData  NVARCHAR(500)  
 	  ,@Remark  NVARCHAR(500)  
-	SET @Begin = GETDATE() 
-	
-	SET @xml = (  
-	   SELECT   
-		@AgentID  AS '@ag', 
-		@AgentLevel  AS '@agl', 
-		@LoginDomain AS '@ldo',
-		@LoginIP AS '@i',
-		@BrowserName AS '@br',
-		@Platform AS '@pl',
-		@CountryCode AS '@co',
-		@UserName AS '@usr'
-		FOR XML PATH('z'), ROOT('r')  
-	  )  
-	SET @LogData = REPLACE(CONVERT(VARCHAR(MAX), @xml), '" />', '"/"')  
+	SET @Begin = GETDATE()   
   
 	SELECT   
 	 @AgentID	= ai.AgentId,  
@@ -62,7 +48,20 @@ BEGIN
 	  --'Wrong username or password.'   		    
 	  SELECT @ErrCode= 17001   
 	  SET @Remark = 'Agent: ' + @UserName +  ' - ' + 'Failed(Username_Password)'     
-	    
+	  SET @xml = (  
+	   SELECT   
+		@AgentID  AS '@ag', 
+		@AgentLevel  AS '@agl', 
+		@LoginDomain AS '@ldo',
+		@LoginIP AS '@i',
+		@BrowserName AS '@br',
+		@Platform AS '@pl',
+		@CountryCode AS '@co',
+		@UserName AS '@usr'
+		FOR XML PATH('z'), ROOT('r')  
+	  )  
+	SET @LogData = REPLACE(CONVERT(VARCHAR(MAX), @xml), '" />', '"/"')
+	  
 	  SET @End  = GETDATE()  
 	  SET @Duration = DATEDIFF(MILLISECOND,@Begin,@End)  
 	  
@@ -79,6 +78,21 @@ BEGIN
 	BEGIN  
 	  --'This user is not open.'    
 	  SELECT @ErrCode= 17002     
+	  
+	  SET @xml = (  
+	   SELECT   
+		@AgentID  AS '@ag', 
+		@AgentLevel  AS '@agl', 
+		@LoginDomain AS '@ldo',
+		@LoginIP AS '@i',
+		@BrowserName AS '@br',
+		@Platform AS '@pl',
+		@CountryCode AS '@co',
+		@UserName AS '@usr'
+		FOR XML PATH('z'), ROOT('r')  
+	  )  
+	  SET @LogData = REPLACE(CONVERT(VARCHAR(MAX), @xml), '" />', '"/"')
+	  
 	  SET @Remark = 'Agent: ' + @UserName + ' - ' + 'Failed(User_Not_Open)'    
 	    
 	  SET @End  = GETDATE()  
@@ -103,7 +117,20 @@ BEGIN
 	
 	SET @AgentID		= ISNULL(@AgentID,0)
 	SET @Remark = 'Agent: ' + @UserName + ' - ' + 'Success'  
-
+	SET @xml = (  
+	   SELECT   
+		@AgentID  AS '@ag', 
+		@AgentLevel  AS '@agl', 
+		@LoginDomain AS '@ldo',
+		@LoginIP AS '@i',
+		@BrowserName AS '@br',
+		@Platform AS '@pl',
+		@CountryCode AS '@co',
+		@UserName AS '@usr'
+		FOR XML PATH('z'), ROOT('r')  
+	  )  
+	SET @LogData = REPLACE(CONVERT(VARCHAR(MAX), @xml), '" />', '"/"')
+	
 	SET @End		= GETDATE()
 	SET @Duration	= DATEDIFF(MILLISECOND,@Begin,@End)
 
