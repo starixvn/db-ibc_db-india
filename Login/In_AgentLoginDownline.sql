@@ -110,8 +110,8 @@ BEGIN
 END
 GO
 
-GRANT EXECUTE ON [dbo].[In_CheckIn] TO bodbDownlineNet   
+GRANT EXECUTE ON [dbo].[In_AgentLoginDownline] TO bodbDownlineNet   
 GO
-GRANT EXECUTE ON [dbo].[In_CheckIn] TO bodbDownlineNetView
+GRANT EXECUTE ON [dbo].[In_AgentLoginDownline] TO bodbDownlineNetView
 GO
-GRANT VIEW definition ON [dbo].[In_CheckIn] TO vnteam
+GRANT VIEW definition ON [dbo].[In_AgentLoginDownline] TO vnteam
