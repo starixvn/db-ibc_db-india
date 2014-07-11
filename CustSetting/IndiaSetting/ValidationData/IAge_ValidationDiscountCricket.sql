@@ -23,7 +23,7 @@ AS
  * Revisions :   
 
  * Parameters:
- *	•
+ *	•@MsgId : 10,300	-> 10,399
  *	•
  *  
  */
@@ -45,6 +45,24 @@ BEGIN
 	BEGIN
 	SELECT @MsgId=10301	--'Invalid commission rate'
 	RETURN
+	END
+
+-- Check validate range
+	SELECT @SportTypeOutput = 0
+	SELECT TOP (1) @SportTypeOutput = d.SportType, @BetTypeOutput = d.BetType
+	FROM @TableDiscount d
+		INNER JOIN @TableParentDiscount p 
+		ON d.SportType = p.SportType
+			AND d.BetType = p.BetType
+			AND (d.DiscountA > p.DiscountA
+				OR d.DiscountB > p.DiscountB
+				OR d.DiscountC > p.DiscountC
+				OR d.DiscountD > p.DiscountD)
+
+	IF @SportTypeOutput <> 0
+	BEGIN
+		SELECT @MsgId = 10302 --'Invalid commission rate'
+		RETURN
 	END
 END
 

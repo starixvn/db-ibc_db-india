@@ -5,11 +5,11 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-ALTER PROCEDURE [dbo].[IAge_AgentRootInsAgentAdvanceMode]	
+ALTER PROCEDURE [dbo].[IAge_AgentInsAgentAdvanceMode]	
 	@AgentId			INT				= 0			OUTPUT,
 	@Username			NVARCHAR(50), 
 	@Userpwd			VARCHAR(50),
-	@AgentL0Id			INT,
+	@ParentID			INT,
 	@FirstName			NVARCHAR(50)	=NULL,
 	@LastName			NVARCHAR(50)	=NULL,
 	@Phone				VARCHAR(50)		=NULL,
@@ -41,10 +41,8 @@ BEGIN
 
 	-- Set default creator is parent agent
 	IF @Creator IS NULL
-		SET @Creator = @AgentL0Id
+		SET @Creator = @ParentID
 
-		-- Check if parent ID not exist
-	
 	-- Begin INSERT Agent1
 	DECLARE @UplineNode				HIERARCHYID,
 			@LastChild				HIERARCHYID,
@@ -55,13 +53,14 @@ BEGIN
 		@UplineNode = AgentHId,
 		@Currency =Currency
 	FROM AgentInfo WITH (NOLOCK)
-	WHERE AgentId = @AgentL0Id
+	WHERE AgentId = @ParentID
 
 	-- Get last child hierarchyid 
 	SELECT @LastChild = MAX(AgentHId) 
 	FROM AgentInfo WITH (NOLOCK)
 	WHERE AgentHId.GetAncestor(1) = @UplineNode
 	 
+
 	-- Insert into AgentInfo
 	INSERT INTO AgentInfo (		
 		AgentHId,
@@ -82,7 +81,7 @@ BEGIN
 	)
 	VALUES (		
 		@UplineNode.GetDescendant(@LastChild, NULL),
-		@AgentL0Id,
+		@ParentID,
 		@Username,
 		@Currency,		
 		@Status,		
@@ -102,7 +101,7 @@ BEGIN
 													
 	IF @@ERROR > 0 OR @AgentId IS NULL
 		BEGIN	
-			SELECT @MsgId=10501			
+			SELECT @MsgId=10500			
 				-- 'Failed to insert agent
 			RETURN
 		END		
@@ -112,5 +111,5 @@ END
 GO
 
 
-GRANT EXECUTE ON [IAge_AgentRootInsAgentAdvanceMode] TO bodbDownlineNet 
-GRANT EXECUTE ON [IAge_AgentRootInsAgentAdvanceMode] TO bodbDownlineNetView 
+GRANT EXECUTE ON [IAge_AgentInsAgentAdvanceMode] TO bodbDownlineNet 
+GRANT EXECUTE ON [IAge_AgentInsAgentAdvanceMode] TO bodbDownlineNetView 

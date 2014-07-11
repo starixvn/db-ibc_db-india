@@ -54,7 +54,7 @@ BEGIN
 					BetType
 				
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch203 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch203 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 203
 
 	DELETE FROM @BetLimitParentTable WHERE MinBet=0 AND MaxBet=0 AND MaxPerMatch=0
@@ -75,7 +75,7 @@ BEGIN
 		END
 	
 	IF OBJECT_ID('tempdb..#CustSetting') IS NOT NULL    DROP TABLE #CustSetting
-	SELECT * INTO #CustSetting FROM DBTXN.CustDB.dbo.CustSetting cs WITH(NOLOCK) WHERE CUSTID = @AgentL0Id AND (sporttype=203)
+	SELECT * INTO #CustSetting FROM bodb02.dbo.CustSetting cs WITH(NOLOCK) WHERE CUSTID = @AgentL0Id AND (sporttype=203)
 
 	---- Insert default agent discount (from its parent)
 	DECLARE @TableDiscount dbo.Discount
@@ -108,12 +108,12 @@ BEGIN
 	EXEC [dbo].[IAge_ConvertXMLDataToTable] @XMLData = @PositionTaking, @Mode = 'PT-A'
 
 	-- Insert into Agent PT
-	INSERT INTO  @TableParentPositionTaking(SportType,BetType,IsLive,MaxUpper,MinGiven,MaxGiven)
+	INSERT INTO  @TableParentPositionTaking(SportType,BetType,IsLive,MaxUpper,MaxGiven,MinGiven)
 	SELECT cs.SportType,
 		cs.BetType,
 		0 [IsLive],
 		0 MaxUpperPositionTaking,
-		apositiontaking MaxGivenPositionTaking,
+		10000*mpositiontaking MaxGivenPositionTaking,
 		0 MinGivenPositionTaking
 	FROM #CustSetting cs
 	UNION ALL 
@@ -121,7 +121,7 @@ BEGIN
 		cs.BetType,
 		1 [IsLive],
 		0 MaxUpperPositionTaking,
-		alivepositiontaking MaxGivenPositionTaking,
+		10000*mlivepositiontaking MaxGivenPositionTaking,
 		0 MinGivenPositionTaking
 	FROM #CustSetting cs
 	WHERE alivepositiontaking	<> 0 
@@ -151,3 +151,5 @@ GO
 
 GRANT EXECUTE ON [IAge_AgentRootInsAgentCricket_CheckParam] TO bodbDownlineNet 
 GRANT EXECUTE ON [IAge_AgentRootInsAgentCricket_CheckParam] TO bodbDownlineNetView 
+
+

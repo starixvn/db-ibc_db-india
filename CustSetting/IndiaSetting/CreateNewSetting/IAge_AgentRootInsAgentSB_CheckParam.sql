@@ -56,43 +56,43 @@ BEGIN
 					BetType
 
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 1
 				
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch2 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch2 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 2
 			
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch3 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch3 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 3
 
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch5 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch5 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 5
 				
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch8 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch8 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 8
 
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch10 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch10 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 10
 
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch11 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch11 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 11
 
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch99 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch99 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 99 AND BetType=1
 
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch99MP FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch99MP FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 99 AND BetType=9
 				
 	UPDATE @BetLimitParentTable
-	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch154 FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
+	SET MaxPerMatch =  (SELECT TOP 1 maxpermatch154 FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id)
 	WHERE SportType = 154 AND BetType=20
 
 	DELETE FROM @BetLimitParentTable WHERE MinBet=0 AND MaxBet=0 AND MaxPerMatch=0
@@ -105,7 +105,7 @@ BEGIN
 			, @SportTypeOutput = @BetLimitSportType OUTPUT
 			, @BetTypeOutput = @BetLimitBetType OUTPUT
 			, @BetLimitOutput = @BetLimitOutput OUTPUT		 	
-					
+	
 	IF @MsgId <> 0
 		BEGIN
 			SELECT @MsgId=@MsgId	--'Invalid commission rate'
@@ -113,13 +113,13 @@ BEGIN
 		END
 	
 	IF OBJECT_ID('tempdb..#CustSetting') IS NOT NULL    DROP TABLE #CustSetting
-	SELECT * INTO #CustSetting FROM DBTXN.CustDB.dbo.CustSetting cs WITH(NOLOCK) WHERE CUSTID = @AgentL0Id AND (SportType<=99 OR sporttype=154)
+	SELECT * INTO #CustSetting FROM bodb02.dbo.CustSetting cs WITH(NOLOCK) WHERE CUSTID = @AgentL0Id AND (SportType<=99 OR sporttype=154)
 
 	---- Insert default agent discount (from its parent)
 	DECLARE @TableDiscount dbo.Discount
 	DECLARE @TableParentDiscount dbo.Discount
 	
-	INSERT INTO @TableDiscount (BetType,SportType,DiscountA,DiscountB,DiscountC,DiscountD)
+	INSERT INTO @TableDiscount (SportType,BetType,DiscountA,DiscountB,DiscountC,DiscountD)
 	EXEC [dbo].[IAge_ConvertXMLDataToTable] @XMLData = @Discount, @Mode = 'D-A'
 	
 	INSERT INTO  @TableParentDiscount(SportType,BetType,DiscountA,DiscountB,DiscountC,DiscountD)
@@ -147,12 +147,12 @@ BEGIN
 	EXEC [dbo].[IAge_ConvertXMLDataToTable] @XMLData = @PositionTaking, @Mode = 'PT-A'
 
 	-- Insert into Agent PT
-	INSERT INTO  @TableParentPositionTaking(SportType,BetType,IsLive,MaxUpper,MinGiven,MaxGiven)
+	INSERT INTO  @TableParentPositionTaking(SportType,BetType,IsLive,MaxUpper,MaxGiven,MinGiven)
 	SELECT cs.SportType,
 		cs.BetType,
 		0 [IsLive],
 		0 MaxUpperPositionTaking,
-		apositiontaking MaxGivenPositionTaking,
+		10000*mpositiontaking MaxGivenPositionTaking,
 		0 MinGivenPositionTaking
 	FROM #CustSetting cs
 	UNION ALL 
@@ -160,7 +160,7 @@ BEGIN
 		cs.BetType,
 		1 [IsLive],
 		0 MaxUpperPositionTaking,
-		alivepositiontaking MaxGivenPositionTaking,
+		10000*mlivepositiontaking MaxGivenPositionTaking,
 		0 MinGivenPositionTaking
 	FROM #CustSetting cs
 	WHERE alivepositiontaking	<> 0 

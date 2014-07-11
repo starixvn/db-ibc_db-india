@@ -7,9 +7,9 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-ALTER PROCEDURE [dbo].[IAge_AgentRootInsAgentMain]( @Username NVARCHAR(50)
+ALTER PROCEDURE [dbo].IAge_AgentInsAgentMain( @Username NVARCHAR(50)
 	, @Userpwd VARCHAR(50)
-	, @AgentL0Id INT
+	, @ParentID INT
 	, @FirstName NVARCHAR(50) = NULL
 	, @LastName NVARCHAR(50) = NULL
 	, @Phone VARCHAR(50) = NULL
@@ -50,11 +50,69 @@ AS
  *  
  */
 BEGIN
-	SET NOCOUNT ON
+		SET NOCOUNT ON
 	
-	EXEC [dbo].[IAge_AgentRootInsAgentAdvanceMode] @Username = @Username
+	EXEC [dbo].IAge_AgentInsAgentGeneralInfo_CheckParam @Username = @Username
 		, @Userpwd = @Userpwd
-		, @AgentL0Id  = @AgentL0Id
+		, @ParentID  = @ParentID
+		, @FirstName = @FirstName
+		, @LastName = @LastName
+		, @Phone = @Phone
+		, @Mobile = @Mobile
+		, @Fax = @Fax
+		, @Credit = @Credit
+		, @Status = @Status
+		, @Creator = @Creator
+		, @Ip = @Ip
+
+		, @MsgId = @MsgId OUTPUT
+
+	IF @MsgId>0
+		BEGIN	
+			RETURN
+		END
+
+	  EXEC [dbo].IAge_AgentInsAgentCricket_CheckParam 
+			 @ParentID  = @ParentID
+	
+			, @Discount = @DiscountCricket
+			, @PositionTaking = @PositionTakingCricket
+			, @BetLimit = @BetLimitCricket
+			
+			, @MsgId = @MsgId OUTPUT
+			, @BetLimitSportType = @BetLimitSportType OUTPUT
+			, @BetLimitBetType = @BetLimitBetType OUTPUT
+			, @PTSportType = @PTSportType OUTPUT
+			, @PTBetType = @PTBetType OUTPUT
+			, @BetLimitOutput = @BetLimitOutput OUTPUT
+			, @IsLiveOutput = @IsLiveOutput OUTPUT
+
+	IF @MsgId>0
+		BEGIN	
+			RETURN
+		END
+
+	IF @Discount='' AND @PositionTaking='' AND @BetLimit=''
+		BEGIN
+			EXEC [dbo].IAge_AgentInsAgentSB_CheckParam 
+					  @ParentID  = @ParentID
+	
+					, @Discount = @Discount
+					, @PositionTaking = @PositionTaking
+					, @BetLimit = @BetLimit		
+					, @MsgId = @MsgId OUTPUT
+					, @BetLimitSportType = @BetLimitSportType OUTPUT
+					, @BetLimitBetType = @BetLimitBetType OUTPUT
+					, @PTSportType = @PTSportType OUTPUT
+					, @PTBetType = @PTBetType OUTPUT
+					, @BetLimitOutput = @BetLimitOutput OUTPUT
+					, @IsLiveOutput = @IsLiveOutput OUTPUT
+		END
+
+	EXEC [dbo].[IAge_AgentInsAgentAdvanceMode] 
+	    @Username = @Username
+		, @Userpwd = @Userpwd
+		, @ParentID  = @ParentID
 		, @FirstName = @FirstName
 		, @LastName = @LastName
 		, @Phone = @Phone
@@ -71,10 +129,8 @@ BEGIN
 		
 	IF (ISNULL(@AgentId,0) <> 0 AND @MsgId = 0)
 	BEGIN
-		EXEC [dbo].[IAge_AgentRootInsAgentCricket] 
+		EXEC [dbo].[IAge_AgentInsAgentCricket] 
 			 @AgentId = @AgentId
-			, @Username = @Username
-			, @AgentL0Id  = @AgentL0Id
 	
 			, @Discount = @DiscountCricket
 			, @PositionTaking = @PositionTakingCricket
@@ -92,15 +148,13 @@ BEGIN
 	IF (ISNULL(@AgentId,0) <> 0 AND @MsgId = 0)
 	BEGIN
 		IF @Discount='' AND @PositionTaking='' AND @BetLimit=''
-			EXEC [dbo].[IAge_AgentRootInsAgentSB_DefaultSetting]
-				@AgentL0Id = @AgentL0Id
-				, @AgentId = @AgentId	
-				,  @MsgId = @MsgId OUTPUT
+			EXEC [dbo].IAge_AgentInsAgentSB_DefaultSetting
+				@ParentID = @ParentID
+				,@AgentId = @AgentId	
+				,@MsgId = @MsgId OUTPUT
 		ELSE
-			EXEC [dbo].[IAge_AgentRootInsAgentSB] 
+			EXEC [dbo].[IAge_AgentInsAgentSB] 
 				  @AgentId = @AgentId
-				, @Username = @Username		
-				, @AgentL0Id  = @AgentL0Id
 	
 				, @Discount = @Discount
 				, @PositionTaking = @PositionTaking
@@ -113,11 +167,9 @@ BEGIN
 				, @BetLimitOutput = @BetLimitOutput OUTPUT
 				, @IsLiveOutput = @IsLiveOutput OUTPUT
 	END
-
-
 END
 
 GO 
 
-GRANT EXECUTE ON [IAge_AgentRootInsAgentMain] TO bodbDownlineNet 
-GRANT EXECUTE ON [IAge_AgentRootInsAgentMain] TO bodbDownlineNetView 
+GRANT EXECUTE ON IAge_AgentInsAgentMain TO bodbDownlineNet 
+GRANT EXECUTE ON IAge_AgentInsAgentMain TO bodbDownlineNetView 

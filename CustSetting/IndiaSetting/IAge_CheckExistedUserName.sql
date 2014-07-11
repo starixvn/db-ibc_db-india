@@ -2,7 +2,7 @@ USE [InCustDB]
 GO
 
 ALTER PROCEDURE [dbo].[IAge_CheckExistedUserName]
-	@username nvarchar(30)=null
+	@username nvarchar(100)=null
 AS
 /**
  * Created by	: 20140708@Tom.Vo

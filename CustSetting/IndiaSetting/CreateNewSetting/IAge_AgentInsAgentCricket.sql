@@ -1,10 +1,9 @@
 USE [InCustDB]
 GO
 
-ALTER PROCEDURE [dbo].[IAge_AgentRootInsAgentCricket](
-    @AgentL0Id INT
-	, @AgentId INT
-	, @Username			NVARCHAR(50)
+ALTER PROCEDURE [dbo].[IAge_AgentInsAgentCricket](
+    @AgentId INT
+	
 	, @Discount VARCHAR(MAX) = ''
 	, @PositionTaking VARCHAR(MAX) = ''
 	, @BetLimit VARCHAR(MAX) = ''
@@ -71,8 +70,8 @@ BEGIN
 	FROM @BetLimitTable	
 	IF @@ERROR > 0
 	BEGIN
-		SELECT @MsgId=10512
-			-- 'Failed to insert agent		
+		SELECT @MsgId=10501
+			-- 'Failed to insert agent - Cricket<BetLimit>
 		DELETE FROM AgentBetLimit WITH(ROWLOCK) WHERE AgentId = @AgentID -- ROLL BACK manual
 		RETURN
 	END	
@@ -97,8 +96,8 @@ BEGIN
 	FROM @TableDiscount
 	IF @@ERROR > 0
 	BEGIN
-		SELECT @MsgId=10513
-		-- 'Failed to insert agent
+		SELECT @MsgId=10502
+		-- 'Failed to insert agent - Cricket<Discount>
 		DELETE FROM AgentBetLimit WITH(ROWLOCK) WHERE AgentId = @AgentID AND (sporttype=203)-- ROLL BACK manual
 		DELETE FROM AgentDiscount WITH(ROWLOCK) WHERE AgentId = @AgentID AND (sporttype=203)-- ROLL BACK manual
 		RETURN
@@ -125,8 +124,8 @@ BEGIN
 	
 	IF @@ERROR > 0
 	BEGIN
-		SELECT @MsgId=10514
-			-- 'Failed to insert agent
+		SELECT @MsgId=10503
+			-- 'Failed to insert agent - Cricket<PositionTaking>
 		DELETE FROM AgentBetLimit		WITH(ROWLOCK) WHERE AgentId = @AgentID AND (sporttype=203)-- ROLL BACK manual
 		DELETE FROM AgentDiscount		WITH(ROWLOCK) WHERE AgentId = @AgentID AND (sporttype=203)-- ROLL BACK manual
 		DELETE FROM AgentPositionTaking WITH(ROWLOCK) WHERE AgentId = @AgentID AND (sporttype=203)-- ROLL BACK manual
@@ -138,5 +137,5 @@ END
 
 GO 
 
-GRANT EXECUTE ON [IAge_AgentRootInsAgentCricket] TO bodbDownlineNet 
-GRANT EXECUTE ON [IAge_AgentRootInsAgentCricket] TO bodbDownlineNetView 
+GRANT EXECUTE ON [IAge_AgentInsAgentCricket] TO bodbDownlineNet 
+GRANT EXECUTE ON [IAge_AgentInsAgentCricket] TO bodbDownlineNetView 

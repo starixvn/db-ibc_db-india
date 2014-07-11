@@ -30,13 +30,13 @@ BEGIN
 	END
 	ELSE IF @Mode = 'D-A'--discount on agent
 	BEGIN
-		SELECT Data.BetType, Data.SportType, Data.DiscountA, Data.DiscountB, Data.DiscountC, Data.DiscountD
+		SELECT Data.SportType,Data.BetType,  Data.DiscountA, Data.DiscountB, Data.DiscountC, Data.DiscountD
 		FROM OPENXML(@DocHandler, '/ROOT/Discount', 1) 
 		WITH (SportType SMALLINT, BetType SMALLINT, DiscountA DECIMAL(9, 8), DiscountB DECIMAL(9, 8), DiscountC DECIMAL(9, 8), DiscountD DECIMAL(9, 8)) AS Data
 	END
 	ELSE IF @Mode = 'D-M' -- discount on member
 	BEGIN
-		SELECT Data.BetType, Data.SportType, Data.Discount
+		SELECT Data.SportType,Data.BetType, Data.Discount
 		FROM OPENXML(@DocHandler, '/ROOT/Discount', 1) 
 		WITH (SportType SMALLINT, BetType SMALLINT, Discount DECIMAL(9, 8)) AS Data
 	END

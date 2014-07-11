@@ -66,8 +66,8 @@ BEGIN
 			RETURN
 		END
 
-	SELECT TOP 1 @ParentCredit=Credit,@Currency=Currency FROM DBTXN.CustDB.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id
-	SELECT TOP 1 @CurrencyName=Currency FROM DBTXN.CustDB.dbo.Exchange  WITH (NOLOCK) WHERE exchangeid=@Currency
+	SELECT TOP 1 @ParentCredit=Credit,@Currency=Currency FROM bodb02.dbo.Custinfo  WITH (NOLOCK) WHERE custid=@AgentL0Id
+	SELECT TOP 1 @CurrencyName=Currency FROM bodb02.dbo.Exchange  WITH (NOLOCK) WHERE exchangeid=@Currency
 	 
 	--Check if username exists
 	IF EXISTS (SELECT TOP 1 1 FROM	[dbo].[AgentInfo] a WITH (NOLOCK) WHERE a.UserName=@Username)
@@ -78,7 +78,7 @@ BEGIN
 		END
 
 	--Check if username exists
-	IF EXISTS (SELECT TOP 1 1 FROM DBTXN.CustDB.dbo.Custinfo a WITH (NOLOCK) WHERE a.UserName=@Username)
+	IF EXISTS (SELECT TOP 1 1 FROM bodb02.dbo.Custinfo a WITH (NOLOCK) WHERE a.UserName=@Username)
 		BEGIN			
 			SELECT @MsgId=10003		
 				--Another user already exists in IBC system with the same username.				
@@ -102,8 +102,6 @@ BEGIN
 		END
 	END	
 END
-
-
 
 GO 
 
